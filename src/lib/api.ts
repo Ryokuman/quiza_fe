@@ -1,5 +1,6 @@
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+// API calls go through Next.js rewrite proxy (/api/* → backend)
+// This keeps cookies same-origin, avoiding 3rd party cookie issues in webviews.
+const BASE_URL = "/api";
 
 export async function apiFetch(
   path: string,
