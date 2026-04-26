@@ -26,6 +26,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -154,32 +155,37 @@ export default function HomePage() {
                   {/* 삭제 확인 바 */}
                   {deletingGoalId === domain.goalId && (
                     <div
-                      className="flex items-center justify-between rounded-lg bg-destructive/10 px-3 py-2"
+                      className="flex items-center justify-between rounded-lg bg-secondary px-3 py-2"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <span className="text-xs text-destructive">
+                      <span className="text-xs text-muted-foreground">
                         이 목표를 삭제할까요?
                       </span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setDeletingGoalId(null)}
-                          className="rounded-md px-3 py-1 text-xs text-muted-foreground hover:bg-background"
+                          disabled={deleteLoading}
+                          className="rounded-md px-3 py-1 text-xs text-muted-foreground hover:bg-background disabled:opacity-50"
                         >
                           취소
                         </button>
                         <button
                           onClick={async () => {
+                            setDeleteLoading(true);
                             try {
                               await deactivateGoal(domain.goalId);
                               setDeletingGoalId(null);
                               await loadData();
                             } catch {
                               setDeletingGoalId(null);
+                            } finally {
+                              setDeleteLoading(false);
                             }
                           }}
-                          className="rounded-md bg-destructive px-3 py-1 text-xs text-destructive-foreground"
+                          disabled={deleteLoading}
+                          className="rounded-md bg-foreground px-3 py-1 text-xs text-background disabled:opacity-50"
                         >
-                          삭제
+                          {deleteLoading ? "삭제 중..." : "삭제"}
                         </button>
                       </div>
                     </div>
