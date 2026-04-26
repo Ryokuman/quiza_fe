@@ -46,7 +46,7 @@ export default function StatsPage() {
       : 0;
 
   return (
-    <div className="flex min-h-screen flex-col pb-20">
+    <div className="flex min-h-[100dvh] flex-col pb-24">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-md items-center px-4">
           <h1 className="text-lg font-bold">학습 통계</h1>

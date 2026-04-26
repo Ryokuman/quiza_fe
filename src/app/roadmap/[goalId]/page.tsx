@@ -80,7 +80,7 @@ export default function RoadmapPage() {
   if (error) return <ErrorMessage onRetry={loadData} />;
   if (!roadmap) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-muted-foreground">로드맵이 아직 생성되지 않았습니다.</p>
         <p className="text-sm text-muted-foreground">잠시 후 다시 확인해주세요.</p>
         <Button variant="outline" onClick={() => router.push("/")}>
@@ -95,7 +95,7 @@ export default function RoadmapPage() {
   );
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-[100dvh] flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-border bg-background/95 px-4 backdrop-blur-sm">
         <button onClick={() => router.push("/")} className="text-muted-foreground">

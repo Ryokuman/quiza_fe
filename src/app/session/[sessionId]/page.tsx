@@ -102,7 +102,7 @@ export default function SessionPage() {
   const optionLabels = ["A", "B", "C", "D"];
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-[100dvh] flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="flex h-14 items-center gap-3 px-4">

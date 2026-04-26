@@ -240,7 +240,7 @@ export default function OnboardingPage() {
   );
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-[100dvh] flex-col">
       {/* Header */}
       <header className="flex h-14 items-center gap-3 border-b border-border px-4">
         <button onClick={() => router.back()} className="text-muted-foreground">
@@ -363,7 +363,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border p-4">
+      <div className="border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-2">
           <input
             type="text"

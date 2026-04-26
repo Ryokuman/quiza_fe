@@ -49,7 +49,7 @@ export default function SessionResultPage() {
 
   if (!result) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-muted-foreground">결과를 불러올 수 없습니다.</p>
         <Button variant="outline" onClick={() => router.push("/")}>
           홈으로 돌아가기
@@ -62,7 +62,7 @@ export default function SessionResultPage() {
   const passed = result.passed;
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center px-4">
       <div className="mx-auto w-full max-w-md space-y-6">
         {/* Result icon */}
         <div className="flex flex-col items-center gap-3 text-center">

@@ -60,7 +60,7 @@ export default function HomePage() {
   if (error) return <ErrorMessage onRetry={loadData} />;
 
   return (
-    <div className="flex min-h-screen flex-col pb-20">
+    <div className="flex min-h-[100dvh] flex-col pb-24">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-md items-center justify-between px-4">
