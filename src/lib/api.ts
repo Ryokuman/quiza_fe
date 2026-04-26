@@ -239,6 +239,12 @@ export async function postPaymentConfirm(body: {
   return res.json() as Promise<IPaymentItem>;
 }
 
+export async function getPendingPayment() {
+  const res = await apiFetch("/payments/pending");
+  if (!res.ok) return null;
+  return res.json() as Promise<IPaymentItem | null>;
+}
+
 export async function getPaymentHistory() {
   const res = await apiFetch("/payments/history");
   if (!res.ok) throw new Error("Failed to fetch payment history");

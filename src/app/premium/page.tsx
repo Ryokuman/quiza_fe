@@ -22,6 +22,7 @@ import {
   postPaymentNonce,
   postPaymentConfirm,
   getPaymentHistory,
+  getPendingPayment,
 } from "@/lib/api";
 import type { IPremiumStatus } from "@/api/structures/IPremiumStatus";
 import type { IPaymentItem } from "@/api/structures/IPaymentItem";
@@ -43,12 +44,45 @@ export default function PremiumPage() {
       setLoading(true);
       setError(false);
       await getMe();
-      const [premiumData, historyData] = await Promise.all([
+      const [premiumData, historyData, pending] = await Promise.all([
         getPremiumStatus(),
         getPaymentHistory(),
+        getPendingPayment(),
       ]);
       setStatus(premiumData);
       setHistory(historyData);
+
+      // Pending 결제가 있으면 MiniKit.pay() 재시도
+      if (pending && MiniKit.isInstalled()) {
+        try {
+          const payResult = await MiniKit.pay({
+            reference: pending.id,
+            to: PAYMENT_RECIPIENT,
+            tokens: [
+              {
+                symbol: Tokens.WLD,
+                token_amount: tokenToDecimals(
+                  parseFloat(pending.amount_wld),
+                  Tokens.WLD,
+                ).toString(),
+              },
+            ],
+            description: "Quiza 프리미엄 구독 (미완료 결제)",
+          });
+          if (payResult.executedWith === "minikit") {
+            await postPaymentConfirm({
+              transactionId: payResult.data.transactionId,
+              reference: pending.id,
+            });
+            setPaySuccess(true);
+            // Reload to reflect premium status
+            const updated = await getPremiumStatus();
+            setStatus(updated);
+          }
+        } catch {
+          // 유저가 취소하거나 실패 — 무시
+        }
+      }
     } catch {
       setError(true);
     } finally {
