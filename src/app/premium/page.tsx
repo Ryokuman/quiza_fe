@@ -14,6 +14,8 @@ import {
 import { BottomNav } from "@/components/bottom-nav";
 import { LoadingScreen } from "@/components/loading-screen";
 import { ErrorMessage } from "@/components/error-message";
+import { MiniKit } from "@worldcoin/minikit-js";
+import { Tokens, tokenToDecimals } from "@worldcoin/minikit-js/commands";
 import {
   getMe,
   getPremiumStatus,
@@ -23,6 +25,8 @@ import {
 } from "@/lib/api";
 import type { IPremiumStatus } from "@/api/structures/IPremiumStatus";
 import type { IPaymentItem } from "@/api/structures/IPaymentItem";
+
+const PAYMENT_RECIPIENT = process.env.NEXT_PUBLIC_PAYMENT_RECIPIENT ?? "0x0000000000000000000000000000000000000000";
 
 const PREMIUM_PRICE_WLD = 1;
 
@@ -56,47 +60,51 @@ export default function PremiumPage() {
     loadData();
   }, [loadData]);
 
+  const [payError, setPayError] = useState<string | null>(null);
+  const [paySuccess, setPaySuccess] = useState(false);
+
   const handlePurchase = useCallback(async () => {
     setPurchasing(true);
+    setPayError(null);
     try {
+      if (!MiniKit.isInstalled()) {
+        setPayError("World App에서만 결제가 가능합니다.");
+        setPurchasing(false);
+        return;
+      }
+
       // Step 1: Get payment nonce from backend
       const nonce = await postPaymentNonce({
         amountWld: PREMIUM_PRICE_WLD,
         productType: "premium_monthly",
       });
 
-      // Step 2: Use MiniKit to process payment
-      // @ts-expect-error MiniKit global
-      const MiniKit = window.MiniKit;
-      if (!MiniKit) {
-        alert("World App에서만 결제가 가능합니다.");
-        setPurchasing(false);
-        return;
-      }
-
-      const payResult = await MiniKit.commandsAsync.pay({
+      // Step 2: MiniKit.pay()
+      const payResult = await MiniKit.pay({
         reference: nonce.reference,
-        to: "", // backend handles recipient
+        to: PAYMENT_RECIPIENT,
         tokens: [
           {
-            symbol: "WLD",
-            token_amount: String(nonce.amountWld),
+            symbol: Tokens.WLD,
+            token_amount: tokenToDecimals(PREMIUM_PRICE_WLD, Tokens.WLD).toString(),
           },
         ],
         description: "Quiza 프리미엄 구독",
       });
 
-      if (payResult.status === "success") {
+      if (payResult.executedWith === "minikit") {
         // Step 3: Confirm payment with backend
         await postPaymentConfirm({
-          transactionId: payResult.response.transaction_id,
+          transactionId: payResult.data.transactionId,
           reference: nonce.reference,
         });
+        setPaySuccess(true);
         await loadData();
-        alert("프리미엄 구독이 완료되었습니다!");
+      } else {
+        setPayError("결제가 취소되었습니다.");
       }
     } catch {
-      alert("결제에 실패했습니다. 다시 시도해주세요.");
+      setPayError("결제에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setPurchasing(false);
     }
@@ -183,6 +191,13 @@ export default function PremiumPage() {
                   </span>
                 </p>
               </div>
+
+              {payError && (
+                <p className="text-sm text-red-500 text-center">{payError}</p>
+              )}
+              {paySuccess && (
+                <p className="text-sm text-green-600 text-center">프리미엄 구독이 완료되었습니다!</p>
+              )}
 
               <Button
                 className="w-full"
