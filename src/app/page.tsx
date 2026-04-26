@@ -25,6 +25,7 @@ export default function HomePage() {
   const [advice, setAdvice] = useState<IAdviceResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [deletingGoalId, setDeletingGoalId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     try {
@@ -112,21 +113,40 @@ export default function HomePage() {
                         {domain.target} / {domain.level}
                       </CardDescription>
                     </div>
-                    <button
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        if (!confirm(`"${domain.name}" 목표를 삭제할까요?`)) return;
-                        try {
-                          await deactivateGoal(domain.goalId);
-                          await loadData();
-                        } catch (err) {
-                          alert("목표 삭제에 실패했습니다.");
-                        }
-                      }}
-                      className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
+                    {deletingGoalId === domain.goalId ? (
+                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await deactivateGoal(domain.goalId);
+                              setDeletingGoalId(null);
+                              await loadData();
+                            } catch {
+                              setDeletingGoalId(null);
+                            }
+                          }}
+                          className="rounded-lg bg-destructive px-2 py-1 text-xs text-destructive-foreground"
+                        >
+                          삭제
+                        </button>
+                        <button
+                          onClick={() => setDeletingGoalId(null)}
+                          className="rounded-lg border px-2 py-1 text-xs"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingGoalId(domain.goalId);
+                        }}
+                        className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">

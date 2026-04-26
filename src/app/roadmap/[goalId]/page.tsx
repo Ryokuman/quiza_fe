@@ -112,10 +112,12 @@ export default function RoadmapPage() {
 
           <div className="space-y-1">
             {sortedCheckpoints.map((cp, i) => {
-              const isLocked = cp.status === "locked";
               const isPassed = cp.status === "passed";
               const isInProgress = cp.status === "in_progress";
-              const canStart = isInProgress || isPassed;
+              // 이전 체크포인트가 passed면 잠금 해제
+              const prevPassed = i === 0 || sortedCheckpoints[i - 1].status === "passed";
+              const isLocked = !isPassed && !isInProgress && !prevPassed;
+              const canStart = isPassed || isInProgress || prevPassed;
 
               return (
                 <div key={cp.id} className="relative flex gap-4 pb-6">
@@ -182,7 +184,7 @@ export default function RoadmapPage() {
                             준비 중...
                           </>
                         ) : isPassed ? (
-                          "다시 도전"
+                          "복습하기"
                         ) : (
                           "세션 시작"
                         )}
