@@ -20,16 +20,18 @@ export default function SessionResultPage() {
   const loadResult = useCallback(async () => {
     try {
       await getMe();
-      // Try to get the result by completing again (idempotent)
-      const res = await completeSession(sessionId);
-      setResult(res);
-    } catch {
-      // If already completed, we still get the result
-      // Try loading from stored data
+      // 먼저 sessionStorage에서 결과 확인
       const stored = sessionStorage.getItem(`result_${sessionId}`);
       if (stored) {
         setResult(JSON.parse(stored));
+        return;
       }
+      // 없으면 API 호출 (직접 URL 진입 등)
+      const res = await completeSession(sessionId);
+      setResult(res);
+      sessionStorage.setItem(`result_${sessionId}`, JSON.stringify(res));
+    } catch {
+      // 이미 완료된 세션 — 결과 불러올 수 없음
     } finally {
       setLoading(false);
     }

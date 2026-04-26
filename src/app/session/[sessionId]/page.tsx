@@ -80,7 +80,8 @@ export default function SessionPage() {
       // Complete session
       setCompleting(true);
       try {
-        await completeSession(sessionId);
+        const completeResult = await completeSession(sessionId);
+        sessionStorage.setItem(`result_${sessionId}`, JSON.stringify(completeResult));
         router.replace(`/session/${sessionId}/result`);
       } catch {
         alert("세션 완료에 실패했습니다.");
@@ -160,17 +161,17 @@ export default function SessionPage() {
                   {currentQuestion.options.map((opt, i) => (
                     <button
                       key={i}
-                      onClick={() => setSelectedOption(optionLabels[i])}
+                      onClick={() => setSelectedOption(String(i))}
                       disabled={submitting}
                       className={`flex w-full items-start gap-3 rounded-xl border p-3 text-left text-sm transition-colors ${
-                        selectedOption === optionLabels[i]
+                        selectedOption === String(i)
                           ? "border-primary bg-primary/5"
                           : "border-border hover:bg-secondary"
                       } disabled:opacity-50`}
                     >
                       <span
                         className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-                          selectedOption === optionLabels[i]
+                          selectedOption === String(i)
                             ? "bg-primary text-primary-foreground"
                             : "bg-secondary text-muted-foreground"
                         }`}
@@ -247,10 +248,12 @@ export default function SessionPage() {
                   )}
                 </div>
 
-                {!result.is_correct && (
+                {!result.is_correct && currentQuestion && (
                   <p className="text-sm">
                     <span className="font-medium">정답: </span>
-                    {result.correct_answer}
+                    {currentQuestion.type === "multi"
+                      ? currentQuestion.options[parseInt(result.correct_answer, 10)] ?? result.correct_answer
+                      : result.correct_answer}
                   </p>
                 )}
 
