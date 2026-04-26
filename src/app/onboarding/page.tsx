@@ -80,7 +80,7 @@ export default function OnboardingPage() {
         type: result.type,
       };
       setMessages((prev) => [...prev, assistantMsg]);
-      setTurn((t) => Math.min(t + 1, 3));
+      setTurn((t) => t + 1);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -127,7 +127,7 @@ export default function OnboardingPage() {
               type: result.type,
             },
           ]);
-          setTurn((t) => Math.min(t + 1, 3));
+          setTurn((t) => t + 1);
           if (result.domains) {
             setContext((prev) => ({
               ...prev,
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
               type: result.type,
             },
           ]);
-          setTurn((t) => Math.min(t + 1, 3));
+          setTurn((t) => t + 1);
         })
         .catch(() => {
           setMessages((prev) => [
@@ -271,22 +271,37 @@ export default function OnboardingPage() {
 
             {/* Domain suggestions */}
             {msg.domains && msg.domains.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2 pl-2">
-                {msg.domains.map((d, di) => (
+              <div className="mt-2 space-y-2 pl-2">
+                <div className="flex flex-wrap gap-2">
+                  {msg.domains.map((d, di) => (
+                    <button
+                      key={di}
+                      onClick={() => handleSelectDomain(d)}
+                      disabled={sending}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary disabled:opacity-50"
+                    >
+                      {d.name}
+                      {d.similarity != null && d.similarity > 0 && (
+                        <span className="ml-1 text-xs text-muted-foreground">
+                          {Math.round(d.similarity * 100)}%
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                {/* "이 중에 없어요" 버튼 — 더 많은 도메인 검색 */}
+                {i === messages.length - 1 && !msg.domains.some((d) => d.isNew) && (
                   <button
-                    key={di}
-                    onClick={() => handleSelectDomain(d)}
+                    onClick={() => {
+                      setInput("이 중에 없어요");
+                      handleSend();
+                    }}
                     disabled={sending}
-                    className="rounded-full border border-border bg-background px-3 py-1.5 text-sm transition-colors hover:bg-secondary disabled:opacity-50"
+                    className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground disabled:opacity-50"
                   >
-                    {d.name}
-                    {d.similarity != null && d.similarity > 0 && (
-                      <span className="ml-1 text-xs text-muted-foreground">
-                        {Math.round(d.similarity * 100)}%
-                      </span>
-                    )}
+                    이 중에 없어요
                   </button>
-                ))}
+                )}
               </div>
             )}
 
