@@ -420,7 +420,7 @@ export default function OnboardingPage() {
                     </button>
                   )}
                 </div>
-                {selectedTagIds.size > 0 && (
+                {i === messages.length - 1 && selectedTagIds.size > 0 && (
                   <Button
                     size="sm"
                     onClick={() => handleConfirmTags(msg.tags!)}
