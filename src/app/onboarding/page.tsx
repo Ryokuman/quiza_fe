@@ -64,11 +64,18 @@ export default function OnboardingPage() {
     setSending(true);
 
     try {
+      // 새 텍스트 입력 → suggestedDomains/Tags 리셋 (새 검색)
+      const freshContext = {
+        ...context,
+        suggestedDomains: undefined,
+        suggestedTags: undefined,
+      };
       const body = {
         message: text,
         turn,
-        context,
+        context: freshContext,
       };
+      setContext(freshContext);
       const result = await postOnboardingChat(body);
 
       const assistantMsg: ChatMessage = {
