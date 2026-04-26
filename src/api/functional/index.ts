@@ -18,9 +18,9 @@ export * as payments from "./payments/index";
 export * as onboarding from "./onboarding/index";
 export * as goals from "./goals/index";
 export * as domains from "./domains/index";
+export * as auth from "./auth/index";
 export * as answers from "./answers/index";
 export * as advice from "./advice/index";
-export * as auth from "./auth/index";
 
 /**
  * @controller AppController.getHello

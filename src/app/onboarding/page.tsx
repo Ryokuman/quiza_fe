@@ -219,7 +219,7 @@ export default function OnboardingPage() {
       setCreating(true);
       try {
         const result = await createGoal({
-          domain: confirmed.domainId,
+          domain: confirmed.domainName || confirmed.domainId,
           target: confirmed.target,
           level: "beginner",
           tagIds: confirmed.tagIds,
