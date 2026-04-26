@@ -113,40 +113,17 @@ export default function HomePage() {
                         {domain.target} / {domain.level}
                       </CardDescription>
                     </div>
-                    {deletingGoalId === domain.goalId ? (
-                      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await deactivateGoal(domain.goalId);
-                              setDeletingGoalId(null);
-                              await loadData();
-                            } catch {
-                              setDeletingGoalId(null);
-                            }
-                          }}
-                          className="rounded-lg bg-destructive px-2 py-1 text-xs text-destructive-foreground"
-                        >
-                          삭제
-                        </button>
-                        <button
-                          onClick={() => setDeletingGoalId(null)}
-                          className="rounded-lg border px-2 py-1 text-xs"
-                        >
-                          취소
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeletingGoalId(domain.goalId);
-                        }}
-                        className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                      >
-                        <Trash2 className="size-4" />
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingGoalId(
+                          deletingGoalId === domain.goalId ? null : domain.goalId,
+                        );
+                      }}
+                      className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -174,6 +151,39 @@ export default function HomePage() {
                     계속하기
                     <ChevronRight className="size-4" />
                   </Button>
+                  {/* 삭제 확인 바 */}
+                  {deletingGoalId === domain.goalId && (
+                    <div
+                      className="flex items-center justify-between rounded-lg bg-destructive/10 px-3 py-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <span className="text-xs text-destructive">
+                        이 목표를 삭제할까요?
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setDeletingGoalId(null)}
+                          className="rounded-md px-3 py-1 text-xs text-muted-foreground hover:bg-background"
+                        >
+                          취소
+                        </button>
+                        <button
+                          onClick={async () => {
+                            try {
+                              await deactivateGoal(domain.goalId);
+                              setDeletingGoalId(null);
+                              await loadData();
+                            } catch {
+                              setDeletingGoalId(null);
+                            }
+                          }}
+                          className="rounded-md bg-destructive px-3 py-1 text-xs text-destructive-foreground"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
