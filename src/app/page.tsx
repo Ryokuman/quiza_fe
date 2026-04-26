@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, ChevronRight, Sparkles } from "lucide-react";
+import { Plus, ChevronRight, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +14,7 @@ import {
 import { BottomNav } from "@/components/bottom-nav";
 import { LoadingScreen } from "@/components/loading-screen";
 import { ErrorMessage } from "@/components/error-message";
-import { getMe, getUserDomains, getAdvice } from "@/lib/api";
+import { getMe, getUserDomains, getAdvice, deactivateGoal } from "@/lib/api";
 import type { IDomainProgress } from "@/api/structures/IDomainProgress";
 import type { IAdviceResult } from "@/api/structures/IAdviceResult";
 
@@ -105,10 +105,25 @@ export default function HomePage() {
             return (
               <Card key={domain.goalId} className="cursor-pointer transition-shadow hover:shadow-md">
                 <CardHeader>
-                  <CardTitle>{domain.name}</CardTitle>
-                  <CardDescription>
-                    {domain.target} / {domain.level}
-                  </CardDescription>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle>{domain.name}</CardTitle>
+                      <CardDescription>
+                        {domain.target} / {domain.level}
+                      </CardDescription>
+                    </div>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(`"${domain.name}" 목표를 삭제할까요?`)) return;
+                        await deactivateGoal(domain.goalId);
+                        loadData();
+                      }}
+                      className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="space-y-1.5">

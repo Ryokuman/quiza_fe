@@ -94,6 +94,14 @@ export async function getUserGoals() {
   return res.json() as Promise<IGoalItem[]>;
 }
 
+export async function deactivateGoal(goalId: string) {
+  const res = await apiFetch(`/goals/${encodeURIComponent(goalId)}/deactivate`, {
+    method: "PATCH",
+  });
+  if (!res.ok) throw new Error("Failed to deactivate goal");
+  return res.json() as Promise<{ success: boolean }>;
+}
+
 export async function createGoal(body: ICreateGoalBody) {
   const res = await apiFetch("/goals", {
     method: "POST",
