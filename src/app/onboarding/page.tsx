@@ -288,20 +288,59 @@ export default function OnboardingPage() {
                       )}
                     </button>
                   ))}
+                  {/* "이 중에 없어요" — 같은 칩 스타일 */}
+                  {i === messages.length - 1 && !msg.domains.some((d) => d.isNew) && (
+                    <button
+                      onClick={() => {
+                        setMessages((prev) => [
+                          ...prev,
+                          { role: "user", content: "이 중에 없어요" },
+                        ]);
+                        setSending(true);
+                        postOnboardingChat({
+                          message: "이 중에 없어요",
+                          turn: turn + 1,
+                          context: {
+                            ...context,
+                            suggestedDomains: [
+                              ...(context?.suggestedDomains ?? []),
+                              ...msg.domains!.filter((d) => d.id).map((d) => ({
+                                id: d.id!,
+                                name: d.name,
+                                similarity: d.similarity ?? 0,
+                              })),
+                            ],
+                          },
+                        })
+                          .then((result) => {
+                            setMessages((prev) => [
+                              ...prev,
+                              {
+                                role: "assistant",
+                                content: result.message,
+                                domains: result.domains,
+                                tags: result.tags,
+                                confirmed: result.confirmed,
+                                type: result.type,
+                              },
+                            ]);
+                            setTurn((t) => t + 1);
+                          })
+                          .catch(() => {
+                            setMessages((prev) => [
+                              ...prev,
+                              { role: "assistant", content: "오류가 발생했습니다." },
+                            ]);
+                          })
+                          .finally(() => setSending(false));
+                      }}
+                      disabled={sending}
+                      className="rounded-full border border-dashed border-muted-foreground/50 bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary disabled:opacity-50"
+                    >
+                      이 중에 없어요
+                    </button>
+                  )}
                 </div>
-                {/* "이 중에 없어요" 버튼 — 더 많은 도메인 검색 */}
-                {i === messages.length - 1 && !msg.domains.some((d) => d.isNew) && (
-                  <button
-                    onClick={() => {
-                      setInput("이 중에 없어요");
-                      handleSend();
-                    }}
-                    disabled={sending}
-                    className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground disabled:opacity-50"
-                  >
-                    이 중에 없어요
-                  </button>
-                )}
               </div>
             )}
 
