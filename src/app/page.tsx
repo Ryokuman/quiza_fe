@@ -116,8 +116,12 @@ export default function HomePage() {
                       onClick={async (e) => {
                         e.stopPropagation();
                         if (!confirm(`"${domain.name}" 목표를 삭제할까요?`)) return;
-                        await deactivateGoal(domain.goalId);
-                        loadData();
+                        try {
+                          await deactivateGoal(domain.goalId);
+                          await loadData();
+                        } catch (err) {
+                          alert("목표 삭제에 실패했습니다.");
+                        }
                       }}
                       className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     >
