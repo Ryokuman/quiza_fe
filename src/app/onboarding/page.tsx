@@ -364,6 +364,61 @@ export default function OnboardingPage() {
                       {t.name}
                     </button>
                   ))}
+                  {/* "이 중에 없어요" — 다음 5개 태그 로드 */}
+                  {i === messages.length - 1 && (
+                    <button
+                      onClick={() => {
+                        setMessages((prev) => [
+                          ...prev,
+                          { role: "user", content: "이 중에 없어요" },
+                        ]);
+                        setSending(true);
+                        const allSeen = [
+                          ...(context?.suggestedTags ?? []),
+                          ...msg.tags!.map((t) => ({ id: t.id, name: t.name })),
+                        ];
+                        // 중복 제거
+                        const seenMap = new Map(allSeen.map((t) => [t.id, t]));
+                        postOnboardingChat({
+                          message: "이 중에 없어요",
+                          turn: turn + 1,
+                          context: {
+                            ...context,
+                            suggestedTags: [...seenMap.values()],
+                          },
+                        })
+                          .then((result) => {
+                            setMessages((prev) => [
+                              ...prev,
+                              {
+                                role: "assistant",
+                                content: result.message,
+                                domains: result.domains,
+                                tags: result.tags,
+                                confirmed: result.confirmed,
+                                type: result.type,
+                              },
+                            ]);
+                            setTurn((t) => t + 1);
+                            setContext((prev) => ({
+                              ...prev,
+                              suggestedTags: [...seenMap.values()],
+                            }));
+                          })
+                          .catch(() => {
+                            setMessages((prev) => [
+                              ...prev,
+                              { role: "assistant", content: "오류가 발생했습니다." },
+                            ]);
+                          })
+                          .finally(() => setSending(false));
+                      }}
+                      disabled={sending}
+                      className="rounded-full border border-dashed border-muted-foreground/50 bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary disabled:opacity-50"
+                    >
+                      이 중에 없어요
+                    </button>
+                  )}
                 </div>
                 {selectedTagIds.size > 0 && (
                   <Button
@@ -374,6 +429,15 @@ export default function OnboardingPage() {
                     태그 확정 ({selectedTagIds.size}개)
                   </Button>
                 )}
+              </div>
+            )}
+
+            {/* 태그 빈 배열 — 직접 입력 안내 */}
+            {msg.tags && msg.tags.length === 0 && msg.type === "suggest_tags" && (
+              <div className="mt-2 pl-2">
+                <p className="text-xs text-muted-foreground">
+                  아래 입력창에 원하는 주제를 입력하면 태그를 만들어드릴게요.
+                </p>
               </div>
             )}
 
