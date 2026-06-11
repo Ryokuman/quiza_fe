@@ -13,7 +13,9 @@ import type { IConfirmPaymentBody } from "../../../structures/IConfirmPaymentBod
 import type { IPaymentItem } from "../../../structures/IPaymentItem";
 
 /**
- * 결제 검증 — MiniKit.pay() 응답 후 Developer Portal API로 검증.
+ * 신규 결제 검증.
+ *
+ * QZ-TASK-010에서 App Store/웹 결제 재설계를 마칠 때까지 비활성화한다.
  *
  * @tag Payment
  *

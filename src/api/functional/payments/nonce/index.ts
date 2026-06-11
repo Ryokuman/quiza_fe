@@ -13,7 +13,9 @@ import type { IGenerateNonceBody } from "../../../structures/IGenerateNonceBody"
 import type { IGenerateNonceResult } from "../../../structures/IGenerateNonceResult";
 
 /**
- * 결제 nonce 생성 — MiniKit.pay() 호출 전에 reference 발급.
+ * 신규 결제 reference 생성.
+ *
+ * QZ-TASK-010에서 App Store/웹 결제 재설계를 마칠 때까지 비활성화한다.
  *
  * @tag Payment
  *
