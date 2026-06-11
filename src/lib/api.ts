@@ -19,37 +19,6 @@ export async function apiFetch(
   });
 }
 
-/* ────────── MiniKit walletAuth 플로우 ────────── */
-
-/**
- * SIWE 인증용 일회성 nonce를 서버에서 발급받는다.
- * MiniKit.walletAuth() 호출 전에 반드시 먼저 호출해야 한다.
- */
-export async function getNonce() {
-  const res = await apiFetch("/auth/nonce");
-  if (!res.ok) throw new Error("Failed to get nonce");
-  return res.json() as Promise<{ nonce: string }>;
-}
-
-/**
- * MiniKit.walletAuth() 결과를 서버로 전송하여 JWT를 발급받는다.
- * 성공 시 서버가 httpOnly 쿠키에 access_token을 세팅한다.
- *
- * @param payload - MiniKit.walletAuth()가 반환한 { message, signature, address }
- * @param nonce - getNonce()로 받은 일회용 nonce
- */
-export async function postWalletAuth(
-  payload: { message: string; signature: string; address: string },
-  nonce: string,
-) {
-  const res = await apiFetch("/auth/wallet", {
-    method: "POST",
-    body: JSON.stringify({ ...payload, nonce }),
-  });
-  if (!res.ok) throw new Error("Wallet auth failed");
-  return res.json() as Promise<{ success: boolean }>;
-}
-
 /* ────────── 기타 인증 ────────── */
 
 export type SocialAuthProvider = "google" | "apple" | "kakao";
@@ -228,43 +197,12 @@ export async function getAdvice() {
 /* ────────── 결제 ────────── */
 
 import type { IPremiumStatus } from "@/api/structures/IPremiumStatus";
-import type { IGenerateNonceResult } from "@/api/structures/IGenerateNonceResult";
 import type { IPaymentItem } from "@/api/structures/IPaymentItem";
 
 export async function getPremiumStatus() {
   const res = await apiFetch("/payments/premium-status");
   if (!res.ok) throw new Error("Failed to fetch premium status");
   return res.json() as Promise<IPremiumStatus>;
-}
-
-export async function postPaymentNonce(body: {
-  amountWld: number;
-  productType: string;
-}) {
-  const res = await apiFetch("/payments/nonce", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error("Failed to generate payment nonce");
-  return res.json() as Promise<IGenerateNonceResult>;
-}
-
-export async function postPaymentConfirm(body: {
-  transactionId: string;
-  reference: string;
-}) {
-  const res = await apiFetch("/payments/confirm", {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error("Failed to confirm payment");
-  return res.json() as Promise<IPaymentItem>;
-}
-
-export async function getPendingPayment() {
-  const res = await apiFetch("/payments/pending");
-  if (!res.ok) return null;
-  return res.json() as Promise<IPaymentItem | null>;
 }
 
 export async function getPaymentHistory() {

@@ -1,4 +1,4 @@
 export type IGenerateNonceBody = {
-  amountWld: number;
+  amount: number;
   productType: string;
 };
