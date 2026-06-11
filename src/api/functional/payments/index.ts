@@ -6,5 +6,6 @@
 //================================================================
 export * as nonce from "./nonce/index";
 export * as confirm from "./confirm/index";
+export * as pending from "./pending/index";
 export * as history from "./history/index";
 export * as premium_status from "./premium_status/index";

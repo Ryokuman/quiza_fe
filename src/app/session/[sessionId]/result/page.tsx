@@ -84,7 +84,7 @@ export default function SessionResultPage() {
           <p className="text-muted-foreground">
             {passed
               ? "체크포인트를 통과했습니다!"
-              : "70% 이상이면 통과입니다. 다시 도전해보세요!"}
+              : "80% 이상이면 통과입니다. 다시 도전해보세요!"}
           </p>
         </div>
 
@@ -118,7 +118,7 @@ export default function SessionResultPage() {
           </div>
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>0%</span>
-            <span className="font-medium">통과: 70%</span>
+            <span className="font-medium">통과: 80%</span>
             <span>100%</span>
           </div>
         </div>
