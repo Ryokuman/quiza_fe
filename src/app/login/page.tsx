@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { Button } from "@worldcoin/mini-apps-ui-kit-react";
 import "@worldcoin/mini-apps-ui-kit-react/styles.css";
 import { getNonce, postWalletAuth, postDevLogin } from "@/lib/api";
+import { hasMiniKit } from "@/lib/minikit";
 
 const IS_DEV = process.env.NEXT_PUBLIC_DEV_MODE === "true";
 
@@ -13,8 +14,11 @@ export default function LoginPage() {
   const router = useRouter();
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isWorldApp, setIsWorldApp] = useState(false);
 
-  const isWorldApp = MiniKit.isInstalled();
+  useEffect(() => {
+    setIsWorldApp(hasMiniKit());
+  }, []);
 
   /**
    * MiniKit walletAuth SIWE 인증 플로우 (Mini App 전용).
