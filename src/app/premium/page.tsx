@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Crown, CheckCircle, Loader2, History } from "lucide-react";
+import { Crown, CheckCircle, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,76 +13,31 @@ import {
 import { BottomNav } from "@/components/bottom-nav";
 import { LoadingScreen } from "@/components/loading-screen";
 import { ErrorMessage } from "@/components/error-message";
-import { MiniKit } from "@worldcoin/minikit-js";
-import { Tokens, tokenToDecimals } from "@worldcoin/minikit-js/commands";
 import {
   getMe,
   getPremiumStatus,
-  postPaymentNonce,
-  postPaymentConfirm,
   getPaymentHistory,
-  getPendingPayment,
 } from "@/lib/api";
-import { hasMiniKit } from "@/lib/minikit";
 import type { IPremiumStatus } from "@/api/structures/IPremiumStatus";
 import type { IPaymentItem } from "@/api/structures/IPaymentItem";
 
-const PAYMENT_RECIPIENT = process.env.NEXT_PUBLIC_PAYMENT_RECIPIENT ?? "0x0000000000000000000000000000000000000000";
-
-const PREMIUM_PRICE_WLD = 1;
-
 export default function PremiumPage() {
-  const router = useRouter();
   const [status, setStatus] = useState<IPremiumStatus | null>(null);
   const [history, setHistory] = useState<IPaymentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(false);
       await getMe();
-      const [premiumData, historyData, pending] = await Promise.all([
+      const [premiumData, historyData] = await Promise.all([
         getPremiumStatus(),
         getPaymentHistory(),
-        getPendingPayment(),
       ]);
       setStatus(premiumData);
       setHistory(historyData);
-
-      // Pending 결제가 있으면 MiniKit.pay() 재시도
-      if (pending && hasMiniKit()) {
-        try {
-          const payResult = await MiniKit.pay({
-            reference: pending.id,
-            to: PAYMENT_RECIPIENT,
-            tokens: [
-              {
-                symbol: Tokens.WLD,
-                token_amount: tokenToDecimals(
-                  parseFloat(pending.amount_wld),
-                  Tokens.WLD,
-                ).toString(),
-              },
-            ],
-            description: "Quiza 프리미엄 구독 (미완료 결제)",
-          });
-          if (payResult.executedWith === "minikit") {
-            await postPaymentConfirm({
-              transactionId: payResult.data.transactionId,
-              reference: pending.id,
-            });
-            setPaySuccess(true);
-            // Reload to reflect premium status
-            const updated = await getPremiumStatus();
-            setStatus(updated);
-          }
-        } catch {
-          // 유저가 취소하거나 실패 — 무시
-        }
-      }
     } catch {
       setError(true);
     } finally {
@@ -93,56 +47,6 @@ export default function PremiumPage() {
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
-
-  const [payError, setPayError] = useState<string | null>(null);
-  const [paySuccess, setPaySuccess] = useState(false);
-
-  const handlePurchase = useCallback(async () => {
-    setPurchasing(true);
-    setPayError(null);
-    try {
-      if (!MiniKit.isInstalled()) {
-        setPayError("World App에서만 결제가 가능합니다.");
-        setPurchasing(false);
-        return;
-      }
-
-      // Step 1: Get payment nonce from backend
-      const nonce = await postPaymentNonce({
-        amountWld: PREMIUM_PRICE_WLD,
-        productType: "premium_monthly",
-      });
-
-      // Step 2: MiniKit.pay()
-      const payResult = await MiniKit.pay({
-        reference: nonce.reference,
-        to: PAYMENT_RECIPIENT,
-        tokens: [
-          {
-            symbol: Tokens.WLD,
-            token_amount: tokenToDecimals(PREMIUM_PRICE_WLD, Tokens.WLD).toString(),
-          },
-        ],
-        description: "Quiza 프리미엄 구독",
-      });
-
-      if (payResult.executedWith === "minikit") {
-        // Step 3: Confirm payment with backend
-        await postPaymentConfirm({
-          transactionId: payResult.data.transactionId,
-          reference: nonce.reference,
-        });
-        setPaySuccess(true);
-        await loadData();
-      } else {
-        setPayError("결제가 취소되었습니다.");
-      }
-    } catch {
-      setPayError("결제에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setPurchasing(false);
-    }
   }, [loadData]);
 
   if (loading) return <LoadingScreen />;
@@ -219,38 +123,19 @@ export default function PremiumPage() {
               </ul>
 
               <div className="rounded-xl bg-secondary p-4 text-center">
-                <p className="text-3xl font-bold">
-                  {PREMIUM_PRICE_WLD} WLD
-                  <span className="text-sm font-normal text-muted-foreground">
-                    /월
-                  </span>
+                <p className="text-base font-semibold">결제 준비 중</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  App Store와 웹 결제 정책을 정리한 뒤 구독을 다시 엽니다.
                 </p>
               </div>
-
-              {payError && (
-                <p className="text-sm text-red-500 text-center">{payError}</p>
-              )}
-              {paySuccess && (
-                <p className="text-sm text-green-600 text-center">프리미엄 구독이 완료되었습니다!</p>
-              )}
 
               <Button
                 className="w-full"
                 size="lg"
-                onClick={handlePurchase}
-                disabled={purchasing}
+                disabled
               >
-                {purchasing ? (
-                  <>
-                    <Loader2 className="mr-2 size-4 animate-spin" />
-                    결제 진행 중...
-                  </>
-                ) : (
-                  <>
-                    <Crown className="size-4" />
-                    프리미엄 구독하기
-                  </>
-                )}
+                <Crown className="size-4" />
+                구독 준비 중
               </Button>
             </CardContent>
           </Card>
@@ -278,7 +163,7 @@ export default function PremiumPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium">{item.amount_wld} WLD</p>
+                    <p className="text-sm font-medium">{item.amount}</p>
                     <span
                       className={`text-xs ${
                         item.status === "confirmed"

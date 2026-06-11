@@ -1,5 +1,5 @@
 export type IGenerateNonceResult = {
   reference: string;
-  amountWld: number;
+  amount: number;
   productType: string;
 };

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Providers from "./providers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Quiza",
-  description: "Personalized quiz generator powered by World ID",
+  description: "Personalized quiz generator for focused learning",
 };
 
 export const viewport: Viewport = {
@@ -36,7 +35,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden">
-        <Providers>{children}</Providers>
+        {children}
       </body>
     </html>
   );

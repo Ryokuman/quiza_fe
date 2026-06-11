@@ -11,8 +11,6 @@ import typia from "typia";
 
 import type { IAuthResponse } from "../../structures/IAuthResponse";
 
-export * as nonce from "./nonce/index";
-export * as wallet from "./wallet/index";
 export * as social from "./social/index";
 export * as dev_login from "./dev_login/index";
 
@@ -26,7 +24,8 @@ export * as dev_login from "./dev_login/index";
  * ```json
  * {
  *   "id": "550e8400-e29b-41d4-a716-446655440000",
- *   "world_id": "0xabcdef1234567890",
+ *   "world_id": null,
+ *   "identities": [{ "provider": "google", "provider_user_id": "..." }],
  *   "nickname": "User-a1b2c3d4",
  *   "created_at": "2026-04-24T00:00:00.000Z",
  *   "updated_at": "2026-04-24T00:00:00.000Z"

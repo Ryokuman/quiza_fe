@@ -16,9 +16,8 @@ import type { IDevLogin } from "../../../structures/IDevLogin";
  * 개발 환경 전용 로그인.
  *
  * 프로덕션에서는 비활성화됨 (ENABLE_DEV_LOGIN=true로 강제 활성화 가능).
- * World ID 검증 없이 즉시 JWT를 발급한다.
  *
- * @param body 테스트용 world_id (선택)
+ * @param body 테스트용 개발 식별자 (선택)
  * @tag Auth
  *
  * @controller AuthController.devLogin
