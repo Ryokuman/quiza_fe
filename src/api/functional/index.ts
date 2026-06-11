@@ -11,8 +11,8 @@ import typia from "typia";
 
 export * as health from "./health/index";
 export * as stats from "./stats/index";
-export * as roadmaps from "./roadmaps/index";
 export * as sessions from "./sessions/index";
+export * as roadmaps from "./roadmaps/index";
 export * as questions from "./questions/index";
 export * as payments from "./payments/index";
 export * as onboarding from "./onboarding/index";
