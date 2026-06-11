@@ -24,6 +24,7 @@ import {
   getPaymentHistory,
   getPendingPayment,
 } from "@/lib/api";
+import { hasMiniKit } from "@/lib/minikit";
 import type { IPremiumStatus } from "@/api/structures/IPremiumStatus";
 import type { IPaymentItem } from "@/api/structures/IPaymentItem";
 
@@ -53,7 +54,7 @@ export default function PremiumPage() {
       setHistory(historyData);
 
       // Pending 결제가 있으면 MiniKit.pay() 재시도
-      if (pending && MiniKit.isInstalled()) {
+      if (pending && hasMiniKit()) {
         try {
           const payResult = await MiniKit.pay({
             reference: pending.id,

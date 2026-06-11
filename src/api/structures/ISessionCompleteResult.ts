@@ -18,7 +18,7 @@ export type ISessionCompleteResult = {
   correct: number;
 
   /**
-   * 합격 여부 (score >= 0.7)
+   * 합격 여부 (score >= 0.8)
    */
   passed: boolean;
 

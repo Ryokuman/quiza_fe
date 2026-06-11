@@ -52,6 +52,17 @@ export async function postWalletAuth(
 
 /* ────────── 기타 인증 ────────── */
 
+export type SocialAuthProvider = "google" | "apple" | "kakao";
+
+export async function postSocialLogin(provider: SocialAuthProvider, token: string) {
+  const res = await apiFetch("/auth/social", {
+    method: "POST",
+    body: JSON.stringify({ provider, token }),
+  });
+  if (!res.ok) throw new Error("Social login failed");
+  return res.json() as Promise<{ success: boolean }>;
+}
+
 export async function postDevLogin(worldId?: string) {
   const res = await apiFetch("/auth/dev-login", {
     method: "POST",
@@ -64,7 +75,18 @@ export async function postDevLogin(worldId?: string) {
 export async function getMe() {
   const res = await apiFetch("/auth/me");
   if (!res.ok) throw new Error("Failed to fetch user");
-  return res.json() as Promise<{ id: string; nickname: string; world_id: string }>;
+  return res.json() as Promise<{
+    id: string;
+    nickname: string;
+    world_id: string | null;
+    identities?: {
+      provider: string;
+      provider_user_id: string;
+      email: string | null;
+      email_verified: boolean;
+      display_name: string | null;
+    }[];
+  }>;
 }
 
 export async function postLogout() {

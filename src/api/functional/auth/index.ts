@@ -13,6 +13,7 @@ import type { IAuthResponse } from "../../structures/IAuthResponse";
 
 export * as nonce from "./nonce/index";
 export * as wallet from "./wallet/index";
+export * as social from "./social/index";
 export * as dev_login from "./dev_login/index";
 
 /**
@@ -53,8 +54,19 @@ export namespace me {
   export type Output = null | {
     created_at: string;
     updated_at: string;
+    identities: {
+      created_at: string;
+      updated_at: string;
+      id: string;
+      user_id: string;
+      provider: "google" | "apple" | "kakao" | "dev" | "legacy_world";
+      provider_user_id: string;
+      email: null | string;
+      email_verified: boolean;
+      display_name: null | string;
+    }[];
     id: string;
-    world_id: string;
+    world_id: null | string;
     nickname: string;
     is_premium: boolean;
   };
@@ -74,16 +86,38 @@ export namespace me {
   export const random = (): Resolved<null | {
     created_at: string;
     updated_at: string;
+    identities: {
+      created_at: string;
+      updated_at: string;
+      id: string;
+      user_id: string;
+      provider: "google" | "apple" | "kakao" | "dev" | "legacy_world";
+      provider_user_id: string;
+      email: null | string;
+      email_verified: boolean;
+      display_name: null | string;
+    }[];
     id: string;
-    world_id: string;
+    world_id: null | string;
     nickname: string;
     is_premium: boolean;
   }> =>
     typia.random<null | {
       created_at: string;
       updated_at: string;
+      identities: {
+        created_at: string;
+        updated_at: string;
+        id: string;
+        user_id: string;
+        provider: "google" | "apple" | "kakao" | "dev" | "legacy_world";
+        provider_user_id: string;
+        email: null | string;
+        email_verified: boolean;
+        display_name: null | string;
+      }[];
       id: string;
-      world_id: string;
+      world_id: null | string;
       nickname: string;
       is_premium: boolean;
     }>();

@@ -14,7 +14,13 @@ export default function ProfilePage() {
   const [user, setUser] = useState<{
     id: string;
     nickname: string;
-    world_id: string;
+    world_id: string | null;
+    identities?: {
+      provider: string;
+      provider_user_id: string;
+      email: string | null;
+      display_name: string | null;
+    }[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,6 +42,13 @@ export default function ProfilePage() {
 
   if (loading) return <LoadingScreen />;
 
+  const primaryIdentity = user?.identities?.[0];
+  const accountLabel = primaryIdentity
+    ? `${primaryIdentity.provider} 계정`
+    : user?.world_id
+      ? `기존 계정 ${user.world_id.slice(0, 8)}...${user.world_id.slice(-6)}`
+      : "연결된 계정 없음";
+
   return (
     <div className="flex min-h-[100dvh] flex-col pb-24">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
@@ -53,9 +66,7 @@ export default function ProfilePage() {
             <div>
               <p className="text-base font-semibold">{user?.nickname}</p>
               <p className="text-xs text-muted-foreground">
-                {user?.world_id
-                  ? `${user.world_id.slice(0, 8)}...${user.world_id.slice(-6)}`
-                  : "World ID 미연결"}
+                {accountLabel}
               </p>
             </div>
           </CardContent>
